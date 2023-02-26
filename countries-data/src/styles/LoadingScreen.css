@@ -1,0 +1,12 @@
+.loadingScreen{
+    position: absolute;
+    top: 68px;
+    left: 0;
+    width: 100%;
+    height: calc(100% - 68px);
+    background-color: rgb(68, 68, 68);
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

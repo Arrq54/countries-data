@@ -1,0 +1,57 @@
+.country-item{
+    width: 320px;
+    height: 380px;
+    display: flex;
+    flex-direction: column;
+    margin: 60px;
+    text-align: center;
+    position: relative;
+    border-radius: 5px;
+    background-color: white;
+    box-shadow: 0px 3px 15px rgba(0,0,0,0.2);
+    cursor: pointer;
+    transition: 0.3s all ease;
+    overflow: hidden;
+}
+.flag{
+    height: 65%;
+    width: 100%;
+}
+.flag>img{
+    max-height: 100%;
+    object-fit: cover;
+}
+.hover-indicator{
+    position: absolute;
+    width: 100%;
+    height: 5px;
+    background-color: #333333;
+    bottom: -5px;
+    border-radius: 10px 10px 0 0;
+    transition: 0.2s all ease-in-out;
+}
+.country-item:hover{
+    box-shadow: 0px 3px 15px rgba(0,0,0,0.7);
+    transition: 0.2s all ease-in-out;
+}
+
+.country-item:hover>.hover-indicator {
+    bottom: 0;
+    transition: 0.2s all ease-in-out;
+    
+}
+.country-name{
+    font-size: 135%;
+}
+.info{
+    display: flex;
+}
+.info-label{
+    font-weight: bold;
+    margin: 5px;
+    margin-right: 0;
+}
+.info-value{
+    margin: 5px;
+    margin-left: 3px;
+}
