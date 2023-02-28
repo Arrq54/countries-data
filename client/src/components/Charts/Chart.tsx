@@ -31,6 +31,7 @@ export default function Chart(props: {data: CountryPopulationName[], type:string
             break;
         case "barchart20":
             chart = <BarChart
+            
             width={props.width}
             height={props.height}
             data={props.data}
@@ -41,11 +42,13 @@ export default function Chart(props: {data: CountryPopulationName[], type:string
               bottom: 5,
             }}
           >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
+            <XAxis dataKey="name" tick={false} />
             <Tooltip />
-            <Legend />
-            <Bar dataKey="population" fill="#8884d8" />
+            <Bar dataKey="population" fill="#8884d8"  >
+            {props.data.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]}/>
+              ))}
+            </Bar>
           </BarChart>
             break;
         default: break;

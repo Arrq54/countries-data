@@ -40,7 +40,7 @@ export default function Charts() {
   return (
     <div >
        
-        <Menu chosen={"Charts"} onItemClick={navigate}/>
+        <Menu chosen={"Charts"}/>
         <div className='charts'>
           <div className='chart'>
             <h3>Population pie chart</h3>

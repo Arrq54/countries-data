@@ -6,6 +6,9 @@ const fs_1 = require("fs");
 const csv_parse_1 = require("csv-parse");
 const app = express();
 const port = 3000;
+let allCountries;
+app.use(express.urlencoded());
+app.use(express.json());
 app.get('/', (req, res) => {
     res.send("AAAddas");
 });
@@ -25,7 +28,6 @@ app.get('/countryNamePopulation', (req, res) => {
         console.log(error.message);
     })
         .on("end", function () {
-        // data.map((i:CountryPopulationName)=>{i.population = i.population.replace("")})
         res.end(JSON.stringify(data));
     });
 });
@@ -58,9 +60,55 @@ app.get('/getNames', (req, res) => {
             console.log(error.message);
         })
             .on("end", function () {
+            allCountries = data.filter(i => { return i.code != ""; });
             res.end(JSON.stringify(data.filter(i => { return i.code != ""; })));
         });
     });
+});
+app.post('/getCountryInfo', (req, res) => {
+    const country = allCountries.find((i) => { return i.code = req.body.code; });
+    console.log(country);
+    res.setHeader('Content-Type', 'application/json');
+    let emissionForCountry = [];
+    let counter = 0;
+    let years = [];
+    (0, fs_1.createReadStream)("./static/csv/Emission.csv")
+        .pipe((0, csv_parse_1.parse)({ delimiter: ",", from_line: 1 }))
+        .on("data", function (row) {
+        if (counter == 0) {
+            years = row.splice(1, row.length);
+            counter += 1;
+        }
+        if (row[0] != country.country_name) {
+            return;
+        }
+        row.map((e, i) => {
+            emissionForCountry.push({ year: years[i], emission: parseInt(e) });
+        });
+    })
+        .on("error", function (error) {
+        console.log(error.message);
+    })
+        .on("end", function () {
+        res.end(JSON.stringify(emissionForCountry));
+    });
+    // let data:Array<CountryPopulationName> = [];
+    // res.setHeader('Content-Type', 'application/json');
+    // createReadStream("./static/csv/population.csv")
+    // .pipe(parse({ delimiter: ";", from_line: 2 }))
+    //     .on("data", function (row) {
+    //         row[2] = row[2].replace(",","")
+    //         data.push({
+    //             name: row[1],
+    //             population: row[2].replace(",",""),
+    //         })
+    //     })
+    //     .on("error", function (error) {
+    //         console.log(error.message);
+    //     })
+    //     .on("end", function () {
+    //         res.end(JSON.stringify(data));
+    //     });
 });
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);

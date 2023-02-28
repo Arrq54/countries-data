@@ -4,6 +4,7 @@ import logo from './logo.svg';
 import './styles/App.css';
 import MainPage from './components/MainPage/MainPage';
 import Charts from './components/Charts/Charts';
+import CountryInfo from './components/CountryInfo/CountryInfo';
 
 function App() {
   return (
@@ -11,6 +12,8 @@ function App() {
         <Routes>
           <Route path="/" element={<MainPage />}></Route>
           <Route path="/charts" element={<Charts />}></Route>
+          <Route path="/country/:code" element={<CountryInfo />}></Route>
+          
         </Routes>
       </BrowserRouter>
   );

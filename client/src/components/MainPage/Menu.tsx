@@ -2,10 +2,12 @@ import "../../styles/Menu.css"
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
 import {faChartLine, faFlag, faRankingStar, faLocationDot} from "@fortawesome/free-solid-svg-icons"
 import { useState } from "react"
-export default function Menu(props: {chosen:string, onItemClick:(link:string)=>void}) {
+import { useNavigate } from "react-router-dom";
+export default function Menu(props: {chosen:string}) {
+    const navigate = useNavigate();
     const [chosen, setChosen] = useState(props.chosen);
     const clicked = (option:string)=>{
-        props.onItemClick(option);
+        navigate(option)
     }
     return (
     <div className="menu">
