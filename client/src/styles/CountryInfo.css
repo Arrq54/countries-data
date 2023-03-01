@@ -1,0 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@600&display=swap');
+.country-header{
+    font-size: 80px;
+    text-align: center;
+    font-family: 'Source Sans Pro', sans-serif;
+}
+.flag-country-info{
+    position: absolute;
+    top: 68px;
+    right: 0;
+    box-shadow: 0px 3px 15px rgba(0,0,0,0.2);
+}
+.info-country{
+    width: 40%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+}
+.info-element{
+    margin: 5px;
+    display: flex;
+    
+}
+.country-info-charts{
+    margin-top: 90px;
+    border-top: 1px solid black;
+    padding: 50px;
+}
+.select{
+    width: 250px;
+}
+.flex-c{
+    display: flex;
+    justify-content: center;
+}

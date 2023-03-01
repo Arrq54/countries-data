@@ -66,9 +66,12 @@ app.get('/getNames', (req, res) => {
     });
 });
 app.post('/getCountryInfo', (req, res) => {
-    const country = allCountries.find((i) => { return i.code = req.body.code; });
-    console.log(country);
+    let country = allCountries.find((i) => { return i.code === req.body.code; });
+    country.country_name = country.country_name.split('_').join(' ');
     res.setHeader('Content-Type', 'application/json');
+    let names = [];
+    allCountries.map((i) => { names.push(i.country_name); });
+    // allCountries.map(i=>names.push(i.country_name));
     let emissionForCountry = [];
     let counter = 0;
     let years = [];
@@ -78,37 +81,28 @@ app.post('/getCountryInfo', (req, res) => {
         if (counter == 0) {
             years = row.splice(1, row.length);
             counter += 1;
+            return;
         }
         if (row[0] != country.country_name) {
             return;
         }
         row.map((e, i) => {
-            emissionForCountry.push({ year: years[i], emission: parseInt(e) });
+            if (i != 0) {
+                if (e.includes("E")) {
+                    let x = new Number(e);
+                    e = x.toFixed(20);
+                }
+                if (years[i] > 1960)
+                    emissionForCountry.push({ year: years[i], emission: parseInt(e) });
+            }
         });
     })
         .on("error", function (error) {
         console.log(error.message);
     })
         .on("end", function () {
-        res.end(JSON.stringify(emissionForCountry));
+        res.end(JSON.stringify({ name: country.country_name, countries: names, emission: emissionForCountry }));
     });
-    // let data:Array<CountryPopulationName> = [];
-    // res.setHeader('Content-Type', 'application/json');
-    // createReadStream("./static/csv/population.csv")
-    // .pipe(parse({ delimiter: ";", from_line: 2 }))
-    //     .on("data", function (row) {
-    //         row[2] = row[2].replace(",","")
-    //         data.push({
-    //             name: row[1],
-    //             population: row[2].replace(",",""),
-    //         })
-    //     })
-    //     .on("error", function (error) {
-    //         console.log(error.message);
-    //     })
-    //     .on("end", function () {
-    //         res.end(JSON.stringify(data));
-    //     });
 });
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);

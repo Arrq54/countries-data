@@ -1,3 +1,10 @@
-.m-20{
-    margin-top: 20px;
+
+.chart-title{
+    text-align: center;
+}
+.chart-emission{
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    margin-bottom: 40px;
 }
