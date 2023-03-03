@@ -6,6 +6,7 @@ import {parse} from "csv-parse";
 import { CountryPopulationData } from './interfaces/CountryPopulationData';
 import { CountryPopulationName } from './interfaces/CountryPopulationName';
 import { Emissions } from './interfaces/Emissions';
+import { CountryNameCode } from './interfaces/CountryNameCode';
 const app = express();
 const port = 3000;
 
@@ -76,9 +77,8 @@ app.post('/getCountryInfo', (req: Request, res: Response) => {
     res.setHeader('Content-Type', 'application/json');
 
 
-    let names:string[] = [];
-    allCountries.map((i:CountryPopulationData)=>{names.push(i.country_name)})
-    // allCountries.map(i=>names.push(i.country_name));
+    let names:CountryNameCode[] = [];
+    allCountries.map((i:CountryPopulationData)=>{names.push({name: i.country_name,code:  i.code})})
 
 
 

@@ -4,41 +4,102 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import "../../styles/Chart.css"
 import { Emissions } from '../../interfaces/Emissions';
 import { Button, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
-export default function ChartEmission(props: {data: Emissions[], width:number, height:number, countries: string[]}) {
-    let renderLabel = function(entry:CountryPopulationName) {
-        return entry.name;
-    }
+import { CountryNameCode } from '../../interfaces/CountryNameCode';
+import { StackedEmissionChart } from '../../interfaces/StackedEmissionChart';
+import { TooltipProps } from 'recharts';
+import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
+
+export default function ChartEmission(props: {name:string, data: Emissions[], width:number, height:number, countries: CountryNameCode[]}) {
     const [otherCountry, setOtherCountry] = useState<string>("");
+    const [twoCountriesData, setTwoCountriesData] = useState<StackedEmissionChart[]>([])
+    const [charType, setCharType] = useState<string>("single");
     const handleChange = (e:string)=>{
         setOtherCountry(e)
+
+        }
+    
+    let chart;
+
+    const addToChart = async ()=>{
+        let dataToMerge = await fetch("/getCountryInfo", {method: "POST", headers:  {'Accept': 'application/json','Content-Type': 'application/json'},body: JSON.stringify({code: otherCountry}) }).then(data=>data.json())
+
+        let newData:StackedEmissionChart[] = []
+
+        dataToMerge.emission.map((e:Emissions,i:number)=>{
+            newData.push({
+              year: e.year,
+              c2_name: dataToMerge.name,
+              c2_value: e.emission,
+              c1_name: props.name,
+              c1_value: props.data[i].emission
+            })
+        })
+        setTwoCountriesData(newData)
+        setCharType("double")
     }
 
-    const addToChart = ()=>{
-        //TODO ANOTHER COUNTRY TO CHART
-        //https://recharts.org/en-US/examples/StackedAreaChart
+    const CustomTooltip = ({
+      active,
+      payload,
+      label,
+    }: TooltipProps<ValueType, NameType>) => {
+      if (active) {
+        return (
+          <div className="custom-tooltip">
+            <p className="year">{payload?.[0].payload.year}</p>
+            <p className="label c1">{`${payload?.[0].payload.c1_name} : ${payload?.[0].value}`}</p>
+            <p className="label c2">{`${payload?.[0].payload.c2_name} : ${payload?.[1].value}`}</p>
+          </div>
+        );
+      }
+    
+      return null;
+    };
+
+    if(charType == "single"){
+      chart = <AreaChart
+      width={props.width}
+      height={props.height}
+      data={props.data}
+      margin={{
+        top: 10,
+        right: 30,
+        left: 0,
+        bottom: 0,
+      }}
+    >
+      <CartesianGrid strokeDasharray="3 3" />
+      <XAxis dataKey="year" />
+      <Tooltip />
+      <Area type="monotone" dataKey="emission" stroke="#8884d8" fill="#8884d8" />
+    </AreaChart>
+    }else{
+      chart = <AreaChart
+      width={props.width}
+      height={props.height}
+      data={twoCountriesData}
+      margin={{
+        top: 10,
+        right: 30,
+        left: 0,
+        bottom: 0,
+      }}
+    >
+      <CartesianGrid strokeDasharray="3 3" />
+      <XAxis dataKey="name" />
+      <Tooltip content={<CustomTooltip/>} />
+      <Area type="monotone" label="c1_name" name='asdasd'  dataKey="c1_value" stackId="1" stroke="#8884d8" fill="#8884d8" />
+      <Area type="monotone" label="c2_name" dataKey="c2_value" stackId="1" stroke="#82ca9d" fill="#82ca9d" />
+    </AreaChart>
     }
 
+    
     return (
     <div className='chart-emission'>
       <h1 className='chart-title'>Emissions</h1>
       <div className='chart-e'>
-        <AreaChart
-            width={props.width}
-            height={props.height}
-            data={props.data}
-            margin={{
-              top: 10,
-              right: 30,
-              left: 0,
-              bottom: 0,
-            }}
-          >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="year" />
-            <Tooltip />
-            <Area type="monotone" dataKey="emission" stroke="#8884d8" fill="#8884d8" />
-          </AreaChart>
-
+       
+          {chart}
           <FormControl className='select'>
             <InputLabel id="demo-simple-select-label">Another country</InputLabel>
             <Select
@@ -49,7 +110,7 @@ export default function ChartEmission(props: {data: Emissions[], width:number, h
               onChange={(e)=>handleChange(e.target.value)}
             >
               {props.countries.map((e,i)=>{
-                return  <MenuItem key={i} value={e}>{e.split("_").join(" ")}</MenuItem>
+                return  <MenuItem key={i} value={e.code}>{e.name.split("_").join(" ")}</MenuItem>
               })}
              
             </Select>

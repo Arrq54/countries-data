@@ -6,11 +6,12 @@ import Chart from '../Charts/Chart';
 import ChartEmission from '../Charts/ChartEmission';
 import { Emissions } from '../../interfaces/Emissions';
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
+import { CountryNameCode } from '../../interfaces/CountryNameCode';
 export default function CountryInfo() {
     let {code} = useParams();
     const [data, setData] = useState<Emissions[]>([]);
     const [name, setName] = useState<string>("");
-    const [allCountries, setAllCountries] = useState<string[]>([]);
+    const [allCountries, setAllCountries] = useState<CountryNameCode[]>([]);
     const [chartType, setChartType] = useState<string>("");
     const changeChart = (c:string)=>{
 
@@ -33,7 +34,7 @@ export default function CountryInfo() {
 
     let chart;
     if(chartType == "Emission"){
-      chart = <ChartEmission width={1200} height={500} data={data} countries={allCountries}/>
+      chart = <ChartEmission name={name} width={1200} height={500} data={data} countries={allCountries}/>
     }
   return (
     <div>

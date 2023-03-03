@@ -70,8 +70,7 @@ app.post('/getCountryInfo', (req, res) => {
     country.country_name = country.country_name.split('_').join(' ');
     res.setHeader('Content-Type', 'application/json');
     let names = [];
-    allCountries.map((i) => { names.push(i.country_name); });
-    // allCountries.map(i=>names.push(i.country_name));
+    allCountries.map((i) => { names.push({ name: i.country_name, code: i.code }); });
     let emissionForCountry = [];
     let counter = 0;
     let years = [];

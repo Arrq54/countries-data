@@ -8,3 +8,16 @@
     width: fit-content;
     margin-bottom: 40px;
 }
+.custom-tooltip{
+    background-color: white;
+    padding: 5px;
+}
+.c1{
+    color: #8884d8;
+}
+.c2{
+    color: #82ca9d;
+}
+.label{
+    font-size: 12px;
+}
