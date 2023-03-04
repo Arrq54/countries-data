@@ -21,6 +21,8 @@ app.get('/', (req: Request, res: Response) => {
 app.get('/countryNamePopulation', (req: Request, res: Response) => {
   let data:Array<CountryPopulationName> = [];
   res.setHeader('Content-Type', 'application/json');
+
+
   createReadStream("./static/csv/population.csv")
   .pipe(parse({ delimiter: ";", from_line: 2 }))
       .on("data", function (row) {
@@ -49,7 +51,9 @@ app.get('/getNames', (req: Request, res: Response) => {
                 country_name: row[1],
                 current_population: row[2],
                 population_2022: row[3],
-                code: ""
+                code: "",
+                capital: "",
+                currency: ""
             })
         })
         .on("error", function (error) {
@@ -64,11 +68,22 @@ app.get('/getNames', (req: Request, res: Response) => {
                     console.log(error.message);
                 })
                 .on("end", function () {
-                    allCountries = data.filter(i=>{return i.code!=""})
-                    res.end(JSON.stringify(data.filter(i=>{return i.code!=""})));
+                    createReadStream("./static/csv/Continents.csv")
+                    .pipe(parse({ delimiter: ";", from_line: 1 }))
+                        .on("data", function (row) {
+                            data.map((i,index)=>{if(i.code === row[2]){data[index].capital = row[5]; data[index].currency = row[4]}})
+                        })
+                        .on("error", function (error) {
+                            console.log(error.message);
+                        })
+                        .on("end", function () {
+                            allCountries = data.filter(i=>{return i.code!=""})
+                            res.end(JSON.stringify(data.filter(i=>{return i.code!=""})));
+                        });
+                    });
                 });
         });
-});
+
 app.post('/getCountryInfo', (req: Request, res: Response) => {
     let country:CountryPopulationData = allCountries.find((i)=>{return i.code===req.body.code})
     country.country_name = country.country_name.split('_').join(' ')
@@ -76,42 +91,7 @@ app.post('/getCountryInfo', (req: Request, res: Response) => {
     res.end(JSON.stringify({name: country.country_name}))
 })
     
-// app.post('/getCountryEmissionInfo', (req: Request, res: Response) => {
-//     let country:CountryPopulationData = allCountries.find((i)=>{return i.code===req.body.code})
-//     country.country_name = country.country_name.split('_').join(' ')
-//     res.setHeader('Content-Type', 'application/json');
-//     let names:CountryNameCode[] = [];
-//     allCountries.map((i:CountryPopulationData)=>{names.push({name: i.country_name,code:  i.code})})
-//     let emissionForCountry: Emissions[] = [];
-//     let counter=0;
-//     let years:number[] = [];
-//     createReadStream("./static/csv/Emission.csv")
-//     .pipe(parse({ delimiter: ",", from_line: 1 }))
-//         .on("data", function (row) {
-//             if(counter==0){
-//                 years = row.splice(1,row.length);
-//                 counter+=1;
-//                 return;
-//             }
-//             if(row[0]!=country.country_name){return}
-//             row.map((e:string,i:number)=>{
-//                 if(i!=0){
-//                     if(e.includes("E")){
-//                         let x = new Number(e);  
-//                         e = x.toFixed(20)
-//                     }
-//                     if(years[i]>1960)emissionForCountry.push({year: years[i], emission: parseInt(e)})
-//                 }
-//             })
-//         })
-//         .on("error", function (error) {
-//             console.log(error.message);
-//         })
-//         .on("end", function () {
-//             res.end(JSON.stringify({name: country.country_name,countries: names,emission: emissionForCountry}));
-//         });
-//   });
-
+// 
   app.post('/getCountryEmissionInfo2', (req: Request, res: Response) => {
     let country:CountryPopulationData = allCountries.find((i)=>{return i.code===req.body.code})
     country.country_name = country.country_name.split('_').join(' ')
@@ -119,6 +99,7 @@ app.post('/getCountryInfo', (req: Request, res: Response) => {
     res.setHeader('Content-Type', 'application/json');
     let names:CountryNameCode[] = [];
     allCountries.map((i:CountryPopulationData)=>{names.push({name: i.country_name,code:  i.code})})
+    allCountries = allCountries.sort()
     let emissionForCountry: Emissions[] = [];
     createReadStream("./static/csv/other emissions/Emissions.csv")
     .pipe(parse({ delimiter: ",", from_line: 1 }))

@@ -56,6 +56,7 @@ export default function ChartEmission(props: {name:string, data: Emissions[], wi
       return null;
     };
 
+ 
     if(charType == "single"){
       chart = <LineChart
       width={props.width}
@@ -68,7 +69,7 @@ export default function ChartEmission(props: {name:string, data: Emissions[], wi
         bottom: 0,
       }}
     >
-      {/* <CartesianGrid strokeDasharray="3 3" /> */}
+      <CartesianGrid strokeDasharray="3 3" />
       <XAxis dataKey="year" />
       <Line type="monotone" dataKey="emission" stroke="#8884d8"  />
     </LineChart>

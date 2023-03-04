@@ -4,5 +4,7 @@ export interface CountryPopulationData {
     current_population:number;
     population_2022: number;
     code: string;
+    capital: string,
+    currency: string;
   
   } 

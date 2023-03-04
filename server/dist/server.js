@@ -42,7 +42,9 @@ app.get('/getNames', (req, res) => {
             country_name: row[1],
             current_population: row[2],
             population_2022: row[3],
-            code: ""
+            code: "",
+            capital: "",
+            currency: ""
         });
     })
         .on("error", function (error) {
@@ -60,8 +62,21 @@ app.get('/getNames', (req, res) => {
             console.log(error.message);
         })
             .on("end", function () {
-            allCountries = data.filter(i => { return i.code != ""; });
-            res.end(JSON.stringify(data.filter(i => { return i.code != ""; })));
+            (0, fs_1.createReadStream)("./static/csv/Continents.csv")
+                .pipe((0, csv_parse_1.parse)({ delimiter: ";", from_line: 1 }))
+                .on("data", function (row) {
+                data.map((i, index) => { if (i.code === row[2]) {
+                    data[index].capital = row[5];
+                    data[index].currency = row[4];
+                } });
+            })
+                .on("error", function (error) {
+                console.log(error.message);
+            })
+                .on("end", function () {
+                allCountries = data.filter(i => { return i.code != ""; });
+                res.end(JSON.stringify(data.filter(i => { return i.code != ""; })));
+            });
         });
     });
 });
@@ -71,44 +86,7 @@ app.post('/getCountryInfo', (req, res) => {
     res.setHeader('Content-Type', 'application/json');
     res.end(JSON.stringify({ name: country.country_name }));
 });
-app.post('/getCountryEmissionInfo', (req, res) => {
-    let country = allCountries.find((i) => { return i.code === req.body.code; });
-    country.country_name = country.country_name.split('_').join(' ');
-    res.setHeader('Content-Type', 'application/json');
-    let names = [];
-    allCountries.map((i) => { names.push({ name: i.country_name, code: i.code }); });
-    let emissionForCountry = [];
-    let counter = 0;
-    let years = [];
-    (0, fs_1.createReadStream)("./static/csv/Emission.csv")
-        .pipe((0, csv_parse_1.parse)({ delimiter: ",", from_line: 1 }))
-        .on("data", function (row) {
-        if (counter == 0) {
-            years = row.splice(1, row.length);
-            counter += 1;
-            return;
-        }
-        if (row[0] != country.country_name) {
-            return;
-        }
-        row.map((e, i) => {
-            if (i != 0) {
-                if (e.includes("E")) {
-                    let x = new Number(e);
-                    e = x.toFixed(20);
-                }
-                if (years[i] > 1960)
-                    emissionForCountry.push({ year: years[i], emission: parseInt(e) });
-            }
-        });
-    })
-        .on("error", function (error) {
-        console.log(error.message);
-    })
-        .on("end", function () {
-        res.end(JSON.stringify({ name: country.country_name, countries: names, emission: emissionForCountry }));
-    });
-});
+// 
 app.post('/getCountryEmissionInfo2', (req, res) => {
     let country = allCountries.find((i) => { return i.code === req.body.code; });
     country.country_name = country.country_name.split('_').join(' ');
@@ -117,6 +95,7 @@ app.post('/getCountryEmissionInfo2', (req, res) => {
     res.setHeader('Content-Type', 'application/json');
     let names = [];
     allCountries.map((i) => { names.push({ name: i.country_name, code: i.code }); });
+    allCountries = allCountries.sort();
     let emissionForCountry = [];
     (0, fs_1.createReadStream)("./static/csv/other emissions/Emissions.csv")
         .pipe((0, csv_parse_1.parse)({ delimiter: ",", from_line: 1 }))

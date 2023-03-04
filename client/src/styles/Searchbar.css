@@ -1,0 +1,37 @@
+.searchbar{
+    width: 90%;
+    background-color: white;
+    margin-left: 50%;
+    transform: translateX(-50%);
+    height: 60px;
+    border-radius: 10px;
+    margin-top: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.searchbar-content{
+    display: flex;
+    width: 100%;
+    border: 2px solid gray;
+    border-radius: 10px;
+    justify-content: center;
+    align-items: center;
+   
+}
+.searchbar-icon{
+    width: 3%;
+    font-size: 25px;
+}
+.searchbar-input{
+    width: 97%;
+    height: 30px;
+    border: none;
+    font-size: 20px;
+}
+.searchbar-input:focus{
+    border: none;
+}
+.searchbar-select{
+    width: 500px;
+}

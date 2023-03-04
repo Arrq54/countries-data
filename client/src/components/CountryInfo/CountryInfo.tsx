@@ -39,9 +39,15 @@ export default function CountryInfo() {
       if(emissionData.length===0){
         fetch("/getCountryEmissionInfo2", {method: "POST", headers:  {'Accept': 'application/json','Content-Type': 'application/json'},body: JSON.stringify({code: code}) }).then(data=>data.json()).then((data)=>{setEmissionData(data.emission);setAllCountries(data.countries)});
       }
-      chart = <ChartEmission name={name} width={1200} height={400} data={emissionData} countries={allCountries}/>
+      chart = <ChartEmission name={name} width={1200} height={400} data={emissionData} countries={allCountries.sort(function (a, b) {
+        if (a.name < b.name) return -1;
+        if (a.name > b.name) return 1;
+        return 0;
+      })}/>
 
     }
+
+    
   return (
     <div>
       <Menu chosen=''/>
@@ -82,7 +88,6 @@ export default function CountryInfo() {
                 onChange={(i)=>changeChart(i.target.value)}
               >
                  <MenuItem value={""}>None</MenuItem>
-                {/* <MenuItem value={"Emission"}>Emission</MenuItem> */}
                 <MenuItem value={"Life expectancy"}>Life expectancy</MenuItem>
                 <MenuItem value={"Emission2"}>Emission</MenuItem>
               </Select>

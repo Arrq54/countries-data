@@ -17,6 +17,14 @@ export default function Country(props: {country: CountryPopulationData}) {
           <div className='info-label'>Population: </div>
           <div className='info-value'>{props.country.current_population}</div>
         </div>
+        <div className='info'>
+          <div className='info-label'>Capital: </div>
+          <div className='info-value'>{props.country.capital}</div>
+        </div>
+        <div className='info'>
+          <div className='info-label'>Currency: </div>
+          <div className='info-value'>{props.country.currency}</div>
+        </div>
         <div className='hover-indicator'></div>
     </div>
   )
