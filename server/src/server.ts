@@ -69,41 +69,63 @@ app.get('/getNames', (req: Request, res: Response) => {
                 });
         });
 });
-
 app.post('/getCountryInfo', (req: Request, res: Response) => {
-
     let country:CountryPopulationData = allCountries.find((i)=>{return i.code===req.body.code})
     country.country_name = country.country_name.split('_').join(' ')
     res.setHeader('Content-Type', 'application/json');
+    res.end(JSON.stringify({name: country.country_name}))
+})
+    
+// app.post('/getCountryEmissionInfo', (req: Request, res: Response) => {
+//     let country:CountryPopulationData = allCountries.find((i)=>{return i.code===req.body.code})
+//     country.country_name = country.country_name.split('_').join(' ')
+//     res.setHeader('Content-Type', 'application/json');
+//     let names:CountryNameCode[] = [];
+//     allCountries.map((i:CountryPopulationData)=>{names.push({name: i.country_name,code:  i.code})})
+//     let emissionForCountry: Emissions[] = [];
+//     let counter=0;
+//     let years:number[] = [];
+//     createReadStream("./static/csv/Emission.csv")
+//     .pipe(parse({ delimiter: ",", from_line: 1 }))
+//         .on("data", function (row) {
+//             if(counter==0){
+//                 years = row.splice(1,row.length);
+//                 counter+=1;
+//                 return;
+//             }
+//             if(row[0]!=country.country_name){return}
+//             row.map((e:string,i:number)=>{
+//                 if(i!=0){
+//                     if(e.includes("E")){
+//                         let x = new Number(e);  
+//                         e = x.toFixed(20)
+//                     }
+//                     if(years[i]>1960)emissionForCountry.push({year: years[i], emission: parseInt(e)})
+//                 }
+//             })
+//         })
+//         .on("error", function (error) {
+//             console.log(error.message);
+//         })
+//         .on("end", function () {
+//             res.end(JSON.stringify({name: country.country_name,countries: names,emission: emissionForCountry}));
+//         });
+//   });
 
-
+  app.post('/getCountryEmissionInfo2', (req: Request, res: Response) => {
+    let country:CountryPopulationData = allCountries.find((i)=>{return i.code===req.body.code})
+    country.country_name = country.country_name.split('_').join(' ')
+    if(country.country_name=="United States")country.country_name = "USA"
+    res.setHeader('Content-Type', 'application/json');
     let names:CountryNameCode[] = [];
     allCountries.map((i:CountryPopulationData)=>{names.push({name: i.country_name,code:  i.code})})
-
-
-
     let emissionForCountry: Emissions[] = [];
-    let counter=0;
-    let years:number[] = [];
-    createReadStream("./static/csv/Emission.csv")
+    createReadStream("./static/csv/other emissions/Emissions.csv")
     .pipe(parse({ delimiter: ",", from_line: 1 }))
         .on("data", function (row) {
-            if(counter==0){
-                years = row.splice(1,row.length);
-                counter+=1;
-                return;
+            if(row[0]===country.country_name && row[2]>1960){
+                emissionForCountry.push({year: row[2], emission: row[3]/1000})
             }
-            if(row[0]!=country.country_name){return}
-            row.map((e:string,i:number)=>{
-                if(i!=0){
-                    if(e.includes("E")){
-                        let x = new Number(e);  
-                        e = x.toFixed(20)
-                    }
-                    if(years[i]>1960)emissionForCountry.push({year: years[i], emission: parseInt(e)})
-                }
-               
-            })
         })
         .on("error", function (error) {
             console.log(error.message);
@@ -112,6 +134,26 @@ app.post('/getCountryInfo', (req: Request, res: Response) => {
             res.end(JSON.stringify({name: country.country_name,countries: names,emission: emissionForCountry}));
         });
   });
+
+app.post('/getCountryLifeExpectancyInfo', (req: Request, res: Response) => {
+    res.setHeader('Content-Type', 'application/json');
+    let country:CountryPopulationData = allCountries.find((i)=>{return i.code===req.body.code})
+    country.country_name = country.country_name.split('_').join(' ')
+
+    createReadStream("./static/csv/Life expectancy.csv")
+    .pipe(parse({ delimiter: ",", from_line: 1 }))
+        .on("data", function (row) {
+            console.log(row);
+            
+        })
+        .on("error", function (error) {
+            console.log(error.message);
+        })
+        .on("end", function () {
+            res.end(JSON.stringify({}));
+        });
+
+})
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);

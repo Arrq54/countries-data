@@ -69,6 +69,12 @@ app.post('/getCountryInfo', (req, res) => {
     let country = allCountries.find((i) => { return i.code === req.body.code; });
     country.country_name = country.country_name.split('_').join(' ');
     res.setHeader('Content-Type', 'application/json');
+    res.end(JSON.stringify({ name: country.country_name }));
+});
+app.post('/getCountryEmissionInfo', (req, res) => {
+    let country = allCountries.find((i) => { return i.code === req.body.code; });
+    country.country_name = country.country_name.split('_').join(' ');
+    res.setHeader('Content-Type', 'application/json');
     let names = [];
     allCountries.map((i) => { names.push({ name: i.country_name, code: i.code }); });
     let emissionForCountry = [];
@@ -101,6 +107,45 @@ app.post('/getCountryInfo', (req, res) => {
     })
         .on("end", function () {
         res.end(JSON.stringify({ name: country.country_name, countries: names, emission: emissionForCountry }));
+    });
+});
+app.post('/getCountryEmissionInfo2', (req, res) => {
+    let country = allCountries.find((i) => { return i.code === req.body.code; });
+    country.country_name = country.country_name.split('_').join(' ');
+    if (country.country_name == "United States")
+        country.country_name = "USA";
+    res.setHeader('Content-Type', 'application/json');
+    let names = [];
+    allCountries.map((i) => { names.push({ name: i.country_name, code: i.code }); });
+    let emissionForCountry = [];
+    (0, fs_1.createReadStream)("./static/csv/other emissions/Emissions.csv")
+        .pipe((0, csv_parse_1.parse)({ delimiter: ",", from_line: 1 }))
+        .on("data", function (row) {
+        if (row[0] === country.country_name && row[2] > 1960) {
+            emissionForCountry.push({ year: row[2], emission: row[3] / 1000 });
+        }
+    })
+        .on("error", function (error) {
+        console.log(error.message);
+    })
+        .on("end", function () {
+        res.end(JSON.stringify({ name: country.country_name, countries: names, emission: emissionForCountry }));
+    });
+});
+app.post('/getCountryLifeExpectancyInfo', (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    let country = allCountries.find((i) => { return i.code === req.body.code; });
+    country.country_name = country.country_name.split('_').join(' ');
+    (0, fs_1.createReadStream)("./static/csv/Life expectancy.csv")
+        .pipe((0, csv_parse_1.parse)({ delimiter: ",", from_line: 1 }))
+        .on("data", function (row) {
+        console.log(row);
+    })
+        .on("error", function (error) {
+        console.log(error.message);
+    })
+        .on("end", function () {
+        res.end(JSON.stringify({}));
     });
 });
 app.listen(port, () => {

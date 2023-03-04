@@ -9,7 +9,8 @@ import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import { CountryNameCode } from '../../interfaces/CountryNameCode';
 export default function CountryInfo() {
     let {code} = useParams();
-    const [data, setData] = useState<Emissions[]>([]);
+
+    const [emissionData, setEmissionData] = useState<Emissions[]>([]);
     const [name, setName] = useState<string>("");
     const [allCountries, setAllCountries] = useState<CountryNameCode[]>([]);
     const [chartType, setChartType] = useState<string>("");
@@ -19,22 +20,27 @@ export default function CountryInfo() {
       
     }
     if(code == undefined){
-      code = "pl";
+      code = "PL";
     }
 
     useEffect(()=>{
-
-      fetch("/getCountryInfo", {method: "POST", headers:  {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({code: code}) }).then(data=>data.json()).then((data)=>{setData(data.emission);setName(data.name);setAllCountries(data.countries)})}
-      
-    ,[])
+      fetch("/getCountryInfo", {method: "POST", headers:  {'Accept': 'application/json','Content-Type': 'application/json'},body: JSON.stringify({code: code}) }).then(data=>data.json()).then((data)=>{setName(data.name)})
+    },[])
 
     let chart;
     if(chartType == "Emission"){
-      chart = <ChartEmission name={name} width={1200} height={500} data={data} countries={allCountries}/>
+      if(emissionData.length===0){
+          fetch("/getCountryEmissionInfo", {method: "POST", headers:  {'Accept': 'application/json','Content-Type': 'application/json'},body: JSON.stringify({code: code}) }).then(data=>data.json()).then((data)=>{setEmissionData(data.emission);setName(data.name);setAllCountries(data.countries)})
+      }
+      chart = <ChartEmission name={name} width={1200} height={500} data={emissionData} countries={allCountries}/>
+    }else if(chartType == "Life expectancy"){
+      fetch("/getCountryLifeExpectancyInfo", {method: "POST", headers:  {'Accept': 'application/json','Content-Type': 'application/json'},body: JSON.stringify({code: code}) }).then(data=>data.json()).then((data)=>{setEmissionData(data.emission);setAllCountries(data.countries)})
+    }else if(chartType == "Emission2"){
+      if(emissionData.length===0){
+        fetch("/getCountryEmissionInfo2", {method: "POST", headers:  {'Accept': 'application/json','Content-Type': 'application/json'},body: JSON.stringify({code: code}) }).then(data=>data.json()).then((data)=>{setEmissionData(data.emission);setAllCountries(data.countries)});
+      }
+      chart = <ChartEmission name={name} width={1200} height={400} data={emissionData} countries={allCountries}/>
+
     }
   return (
     <div>
@@ -76,7 +82,9 @@ export default function CountryInfo() {
                 onChange={(i)=>changeChart(i.target.value)}
               >
                  <MenuItem value={""}>None</MenuItem>
-                <MenuItem value={"Emission"}>Emission</MenuItem>
+                {/* <MenuItem value={"Emission"}>Emission</MenuItem> */}
+                <MenuItem value={"Life expectancy"}>Life expectancy</MenuItem>
+                <MenuItem value={"Emission2"}>Emission</MenuItem>
               </Select>
             </FormControl>
         </div>

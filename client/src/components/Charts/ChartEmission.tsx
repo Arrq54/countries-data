@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { CountryPopulationName } from '../../interfaces/CountryPopulationName'
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, Legend } from 'recharts';
 import "../../styles/Chart.css"
 import { Emissions } from '../../interfaces/Emissions';
 import { Button, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
@@ -21,7 +21,7 @@ export default function ChartEmission(props: {name:string, data: Emissions[], wi
     let chart;
 
     const addToChart = async ()=>{
-        let dataToMerge = await fetch("/getCountryInfo", {method: "POST", headers:  {'Accept': 'application/json','Content-Type': 'application/json'},body: JSON.stringify({code: otherCountry}) }).then(data=>data.json())
+        let dataToMerge = await fetch("/getCountryEmissionInfo2", {method: "POST", headers:  {'Accept': 'application/json','Content-Type': 'application/json'},body: JSON.stringify({code: otherCountry}) }).then(data=>data.json())
 
         let newData:StackedEmissionChart[] = []
 
@@ -57,7 +57,7 @@ export default function ChartEmission(props: {name:string, data: Emissions[], wi
     };
 
     if(charType == "single"){
-      chart = <AreaChart
+      chart = <LineChart
       width={props.width}
       height={props.height}
       data={props.data}
@@ -68,13 +68,12 @@ export default function ChartEmission(props: {name:string, data: Emissions[], wi
         bottom: 0,
       }}
     >
-      <CartesianGrid strokeDasharray="3 3" />
+      {/* <CartesianGrid strokeDasharray="3 3" /> */}
       <XAxis dataKey="year" />
-      <Tooltip />
-      <Area type="monotone" dataKey="emission" stroke="#8884d8" fill="#8884d8" />
-    </AreaChart>
+      <Line type="monotone" dataKey="emission" stroke="#8884d8"  />
+    </LineChart>
     }else{
-      chart = <AreaChart
+      chart = <LineChart
       width={props.width}
       height={props.height}
       data={twoCountriesData}
@@ -87,10 +86,11 @@ export default function ChartEmission(props: {name:string, data: Emissions[], wi
     >
       <CartesianGrid strokeDasharray="3 3" />
       <XAxis dataKey="name" />
-      <Tooltip content={<CustomTooltip/>} />
-      <Area type="monotone" label="c1_name" name='asdasd'  dataKey="c1_value" stackId="1" stroke="#8884d8" fill="#8884d8" />
-      <Area type="monotone" label="c2_name" dataKey="c2_value" stackId="1" stroke="#82ca9d" fill="#82ca9d" />
-    </AreaChart>
+      {/* <Tooltip content={<CustomTooltip/>} /> */}
+      <Legend verticalAlign="top" height={36}/>
+      <Line type="monotone" label="c1_name" name='Main country'  dataKey="c1_value"  stroke="#8884d8" fill="#8884d8" />
+      <Line type="monotone" label="c2_name" name='Added country' dataKey="c2_value"  stroke="#82ca9d" fill="#82ca9d" />
+    </LineChart>
     }
 
     
@@ -98,8 +98,10 @@ export default function ChartEmission(props: {name:string, data: Emissions[], wi
     <div className='chart-emission'>
       <h1 className='chart-title'>Emissions</h1>
       <div className='chart-e'>
-       
-          {chart}
+
+      {chart}
+
+          
           <FormControl className='select'>
             <InputLabel id="demo-simple-select-label">Another country</InputLabel>
             <Select
