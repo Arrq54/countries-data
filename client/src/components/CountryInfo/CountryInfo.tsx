@@ -7,10 +7,14 @@ import ChartEmission from '../Charts/ChartEmission';
 import { Emissions } from '../../interfaces/Emissions';
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import { CountryNameCode } from '../../interfaces/CountryNameCode';
+import ChartLifeExpectancy from '../Charts/ChartLifeExpectancy';
+import { CountryLifeExpectancyInfo } from '../../interfaces/CountryNameLifeExpectancy';
 export default function CountryInfo() {
     let {code} = useParams();
 
     const [emissionData, setEmissionData] = useState<Emissions[]>([]);
+    const [expectancydata, setExpectancy] = useState<CountryLifeExpectancyInfo[]>([]);
+
     const [name, setName] = useState<string>("");
     const [allCountries, setAllCountries] = useState<CountryNameCode[]>([]);
     const [chartType, setChartType] = useState<string>("");
@@ -33,8 +37,12 @@ export default function CountryInfo() {
           fetch("/getCountryEmissionInfo", {method: "POST", headers:  {'Accept': 'application/json','Content-Type': 'application/json'},body: JSON.stringify({code: code}) }).then(data=>data.json()).then((data)=>{setEmissionData(data.emission);setName(data.name);setAllCountries(data.countries)})
       }
       chart = <ChartEmission name={name} width={1200} height={500} data={emissionData} countries={allCountries}/>
+
     }else if(chartType == "Life expectancy"){
-      fetch("/getCountryLifeExpectancyInfo", {method: "POST", headers:  {'Accept': 'application/json','Content-Type': 'application/json'},body: JSON.stringify({code: code}) }).then(data=>data.json()).then((data)=>{setEmissionData(data.emission);setAllCountries(data.countries)})
+      if(expectancydata.length===0){
+        fetch("/getCountryLifeExpectancyInfo", {method: "POST", headers:  {'Accept': 'application/json','Content-Type': 'application/json'},body: JSON.stringify({code: code}) }).then(data=>data.json()).then((data)=>{setExpectancy(data.life_exp);setAllCountries(data.countries)})
+      }
+      chart = <ChartLifeExpectancy name={name} width={1200} height={500} data={expectancydata} countries={allCountries}/>
     }else if(chartType == "Emission2"){
       if(emissionData.length===0){
         fetch("/getCountryEmissionInfo2", {method: "POST", headers:  {'Accept': 'application/json','Content-Type': 'application/json'},body: JSON.stringify({code: code}) }).then(data=>data.json()).then((data)=>{setEmissionData(data.emission);setAllCountries(data.countries)});

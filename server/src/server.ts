@@ -7,6 +7,7 @@ import { CountryPopulationData } from './interfaces/CountryPopulationData';
 import { CountryPopulationName } from './interfaces/CountryPopulationName';
 import { Emissions } from './interfaces/Emissions';
 import { CountryNameCode } from './interfaces/CountryNameCode';
+import { CountryNameLifeExpectancy } from './interfaces/CountryNameLifeExpectancy';
 const app = express();
 const port = 3000;
 
@@ -120,19 +121,26 @@ app.post('/getCountryLifeExpectancyInfo', (req: Request, res: Response) => {
     res.setHeader('Content-Type', 'application/json');
     let country:CountryPopulationData = allCountries.find((i)=>{return i.code===req.body.code})
     country.country_name = country.country_name.split('_').join(' ')
+    if(country.country_name=="United States")country.country_name = "USA"
+    res.setHeader('Content-Type', 'application/json');
+    let names:CountryNameCode[] = [];
+    allCountries.map((i:CountryPopulationData)=>{names.push({name: i.country_name,code:  i.code})})
+    allCountries = allCountries.sort()
+    let lifeExpectancyForCountry: CountryNameLifeExpectancy[] = [];
 
     createReadStream("./static/csv/Life expectancy.csv")
     .pipe(parse({ delimiter: ",", from_line: 1 }))
         .on("data", function (row) {
-            console.log(row);
-            
+            if(row[0]===country.country_name){
+                lifeExpectancyForCountry.push({year: row[1], value: parseFloat(row[2])})
+            }
         })
         .on("error", function (error) {
             console.log(error.message);
         })
         .on("end", function () {
-            res.end(JSON.stringify({}));
-        });
+            res.end(JSON.stringify({name: country.country_name,countries: names,life_exp: lifeExpectancyForCountry}));
+    });
 
 })
 
