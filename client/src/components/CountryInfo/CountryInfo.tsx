@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import Menu from '../MainPage/Menu';
+import Menu from '../Menu';
 import "../../styles/CountryInfo.css"
 import Chart from '../Charts/Chart';
 import ChartEmission from '../Charts/ChartEmission';
@@ -42,7 +42,11 @@ export default function CountryInfo() {
       if(expectancydata.length===0){
         fetch("/getCountryLifeExpectancyInfo", {method: "POST", headers:  {'Accept': 'application/json','Content-Type': 'application/json'},body: JSON.stringify({code: code}) }).then(data=>data.json()).then((data)=>{setExpectancy(data.life_exp);setAllCountries(data.countries)})
       }
-      chart = <ChartLifeExpectancy name={name} width={1200} height={500} data={expectancydata} countries={allCountries}/>
+      let type = "chart"
+      if(expectancydata.length == 0){
+        type="no-data"
+      }
+      chart = <ChartLifeExpectancy type={type} name={name} width={1200} height={500} data={expectancydata} countries={allCountries}/>
     }else if(chartType == "Emission2"){
       if(emissionData.length===0){
         fetch("/getCountryEmissionInfo2", {method: "POST", headers:  {'Accept': 'application/json','Content-Type': 'application/json'},body: JSON.stringify({code: code}) }).then(data=>data.json()).then((data)=>{setEmissionData(data.emission);setAllCountries(data.countries)});

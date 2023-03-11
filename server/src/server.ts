@@ -144,6 +144,95 @@ app.post('/getCountryLifeExpectancyInfo', (req: Request, res: Response) => {
 
 })
 
+
+//TO DO - RANKINGS
+
+
+app.post('/getRanking', (req: Request, res: Response) => {
+    res.setHeader('Content-Type', 'application/json');
+    let fileName:string, countryIndex:number, valueIndex:number, delimeter:string, fromLine:number;
+    switch(req.body.ranking){
+        case "Population":
+            fileName = "population.csv";
+            countryIndex = 1;
+            delimeter = ";"
+            valueIndex = 2;
+            fromLine = 2; 
+            break;
+        case "Crime-rate":
+            fileName = "Crime index 2020.csv";
+            countryIndex = 0;
+            delimeter = ","
+            valueIndex = 1;
+            fromLine = 2; 
+            break;
+        case "Happiness":
+            fileName = "hapinness.csv";
+            countryIndex = 0;
+            delimeter = ","
+            valueIndex = 2;
+            fromLine = 2; 
+            break;
+        case "Alcohol-consumption":
+            fileName = "alcohol_corrected.csv";
+            countryIndex = 0;
+            delimeter = ";"
+            valueIndex = 3;
+            fromLine = 2; 
+            break;
+        case "Health-care":
+            fileName = "Quality of life 2020.csv";
+            countryIndex = 0;
+            delimeter = ","
+            valueIndex = 4;
+            fromLine = 2; 
+            break;
+        case "Quality-of-life":
+            fileName = "Quality of life 2020.csv";
+            countryIndex = 0;
+            delimeter = ","
+            valueIndex = 1;
+            fromLine = 2; 
+            break;
+        case "Pollution":
+            fileName = "Quality of life 2020.csv";
+            countryIndex = 0;
+            delimeter = ","
+            valueIndex = 8;
+            fromLine = 2; 
+            break;
+        case "Suicide-rates":
+            fileName = "suicide-rates.csv";
+            countryIndex = 0;
+            delimeter = ";"
+            valueIndex = 2;
+            fromLine = 2; 
+            break;
+        case "HDI":
+            fileName = "HDI.csv";
+            countryIndex = 2;
+            delimeter = ";"
+            valueIndex = 32;
+            fromLine = 2; 
+            break;   
+            
+        default: break;
+    }
+    let data:{name:string, value:number}[] = []
+    createReadStream(`./static/csv/${fileName}`)
+    .pipe(parse({ delimiter: delimeter, from_line: fromLine }))
+        .on("data", function (row) {
+            data.push({name: row[countryIndex].replaceAll("_"," "), value: parseFloat(row[valueIndex].replaceAll(",",""))})
+        })
+        .on("error", function (error) {
+            console.log(error.message);
+        })
+        .on("end", function () {
+            data = data.sort(function(a, b) {return b.value - a.value;})
+            res.end(JSON.stringify(data));
+    });
+})
+
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });

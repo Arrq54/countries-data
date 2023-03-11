@@ -3,7 +3,7 @@ import { CountryPopulationData } from '../../interfaces/CountryPopulationData'
 import { useNavigate } from "react-router-dom";
 import Country from './Country'
 import "../../styles/MainPage.css"
-import Menu from './Menu'
+import Menu from '../Menu'
 import LoadingScreen from '../LoadingScreen';
 import SearchBar from './SearchBar';
 export default function MainPage() {
@@ -27,7 +27,6 @@ export default function MainPage() {
     
   }
   const changeSort = (sort:string)=>{
-    console.log(sort);
     switch(sort){
       case "pop-asc":
         setVisibleCountries([...visibleCountries.sort(function(a, b) {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
-import Menu from '../MainPage/Menu'
+import Menu from '../Menu'
 import "../../styles/Charts.css"
 
 import { CountryPopulationName } from '../../interfaces/CountryPopulationName';
@@ -13,8 +13,7 @@ export default function Charts() {
 
     useEffect(()=>{
       fetch("/countryNamePopulation").then(data=>data.json()).then((data)=>{
-        // data.map((i:CountryPopulationName)=>{i.population = parseInt(parseInt(i.population.replace(",",""))/1000000)})
-      console.log(data);
+
       data.map((i:CountryPopulationName)=>{
         let x:string =String(i.population).replace(",","")
         i.population = parseInt(x);  
