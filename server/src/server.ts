@@ -201,6 +201,13 @@ app.post('/getRanking', (req: Request, res: Response) => {
             valueIndex = 8;
             fromLine = 2; 
             break;
+        case "Costs-of-living":
+            fileName = "Quality of life 2020.csv";
+            countryIndex = 0;
+            delimeter = ","
+            valueIndex = 5;
+            fromLine = 2; 
+            break;
         case "Suicide-rates":
             fileName = "suicide-rates.csv";
             countryIndex = 0;

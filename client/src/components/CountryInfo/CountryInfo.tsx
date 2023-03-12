@@ -9,12 +9,14 @@ import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import { CountryNameCode } from '../../interfaces/CountryNameCode';
 import ChartLifeExpectancy from '../Charts/ChartLifeExpectancy';
 import { CountryLifeExpectancyInfo } from '../../interfaces/CountryNameLifeExpectancy';
+import { Countrysummary } from '../../interfaces/Countrysummary';
+import LoadingScreen from '../LoadingScreen';
 export default function CountryInfo() {
     let {code} = useParams();
 
     const [emissionData, setEmissionData] = useState<Emissions[]>([]);
     const [expectancydata, setExpectancy] = useState<CountryLifeExpectancyInfo[]>([]);
-
+    const [countrySummaryData, setCountrySummary] = useState<Countrysummary>();
     const [name, setName] = useState<string>("");
     const [allCountries, setAllCountries] = useState<CountryNameCode[]>([]);
     const [chartType, setChartType] = useState<string>("");
@@ -29,6 +31,16 @@ export default function CountryInfo() {
 
     useEffect(()=>{
       fetch("/getCountryInfo", {method: "POST", headers:  {'Accept': 'application/json','Content-Type': 'application/json'},body: JSON.stringify({code: code}) }).then(data=>data.json()).then((data)=>{setName(data.name)})
+      fetch(`https://restcountries.com/v2/alpha?codes=${code}`).then(data=>data.json()).then(data=>setCountrySummary({
+        altSpellings: data[0].altSpellings.join(", ") as string,
+        capital: data[0].capital,
+        nativeName: data[0].nativeName,
+        region: data[0].region,
+        subregion: data[0].subregion,
+        area: data[0].area
+
+      }));
+      
     },[])
 
     let chart;
@@ -56,39 +68,42 @@ export default function CountryInfo() {
         if (a.name > b.name) return 1;
         return 0;
       })}/>
-
     }
 
     
   return (
     <div>
       <Menu chosen=''/>
+     
       <div className='f-center'>
         <div className='country-profile'>
           <h1 className='country-header'>{name}</h1>
         <img className='flag-country-info' src={`https://flagcdn.com/w320/${code.toLowerCase()}.png`} />
-        <div className='info-country'>
-            <div className='info-element'>
-                <div className='info-label'>Lorem: </div>
-                <div className='info-value'>Ipsum </div>
+       
+        {countrySummaryData==null?<LoadingScreen/>: <div className='info-country'><div className='info-element'>
+                <div className='info-label'>Native name: </div>
+                <div className='info-value'>{countrySummaryData.nativeName}</div>
             </div>
             <div className='info-element'>
-                <div className='info-label'>Lorem: </div>
-                <div className='info-value'>Ipsum </div>
+                <div className='info-label'>Alternative names: </div>
+                <div className='info-value'>{countrySummaryData.altSpellings}</div>
             </div>
             <div className='info-element'>
-                <div className='info-label'>Lorem: </div>
-                <div className='info-value'>Ipsum </div>
+                <div className='info-label'>Capital city: </div>
+                <div className='info-value'>{countrySummaryData.capital}</div>
             </div>
             <div className='info-element'>
-                <div className='info-label'>Lorem: </div>
-                <div className='info-value'>Ipsum </div>
+                <div className='info-label'>Region: </div>
+                <div className='info-value'>{countrySummaryData.region}</div>
             </div>
             <div className='info-element'>
-                <div className='info-label'>Lorem: </div>
-                <div className='info-value'>Ipsum </div>
+                <div className='info-label'>Subregion: </div>
+                <div className='info-value'>{countrySummaryData.subregion}</div>
             </div>
-        </div>
+            <div className='info-element'>
+                <div className='info-label'>Area: </div>
+                <div className='info-value'>{countrySummaryData.area}km²</div>
+            </div></div>}
         <div className='country-info-charts'>
             <FormControl  className='select'>
               <InputLabel id="demo-simple-select-label">Choose chart</InputLabel>

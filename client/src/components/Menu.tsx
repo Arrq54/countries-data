@@ -27,10 +27,7 @@ export default function Menu(props: {chosen:string}) {
                 <FontAwesomeIcon  icon={faRankingStar} />
                 <p>Rankings</p>
             </div>
-            <div className={`menu-item ${chosen=="Continents"?"chosen":""}`} onClick={()=>clicked("/continents")}>
-                <FontAwesomeIcon  icon={faLocationDot} />
-                <p>Continents</p>
-            </div>
+
 
         </div>
        

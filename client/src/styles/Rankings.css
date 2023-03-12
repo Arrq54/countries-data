@@ -1,9 +1,9 @@
 .rankings{
     height: calc(100vh - 68px);
-    width: 100%;
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
+    align-items: center;
 }
 a{
     text-decoration: none;
